@@ -566,3 +566,6 @@ pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/vim,macos,latex,python,pycharm,virtualenv,sublimetext
 
+
+.idea/*
+
