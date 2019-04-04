@@ -23,6 +23,26 @@ def custom_ops(n):
     mat_minus_required = tf.reverse(reverse_of_mat_minus_required, [1])
     step_one = tf.add(required_lower_triangle, mat_minus_required)
 
+    # Step 2: Take the maximum value along the columns of A to get a vector m
+    # (i.e. for each column, pick a value that is the maximum among all rows)
+
+    m = tf.reduce_max(step_one, axis=0)
+
+    # Step 3: Consider m to be of the form [m1, m2, ... , mn]. Create a new matrix B such that:
+
+    broadcasted_m = tf.broadcast_to(m, [n, n])
+    zeros_matrix = tf.zeros([n, n])
+    reverse_m = tf.reverse(broadcasted_m, [1])
+    upper_traingular_reverse_m = tf.linalg.band_part(reverse_m, 0, -1)
+
+
+
+
+
+
+
+
+
 
 
 
@@ -46,7 +66,7 @@ def custom_ops(n):
     #
     # softmax_mat = tf.nn.softmax(reverse)
 
-    return step_one
+    return reverse_broadcasted_m
 
 
 if __name__ == '__main__':
