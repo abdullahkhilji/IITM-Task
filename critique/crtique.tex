@@ -1,0 +1,190 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2018
+
+% ready for submission
+% \usepackage{neurips_2018}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2018}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+     \usepackage[final]{nips_2018}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2018}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\title{Brief summary and detailed critique on the paper: Pixel Recurrent Neural Networks}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  Abdullah Faiz Ur Rahman Khilji \\
+  Department of Computer Science and Engineering\\
+  National Institute of Technology Silchar\\
+  \texttt{abdullahkhilji.nits@gmail.com} \\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+\usepackage{relsize}
+
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+\maketitle
+\begin{abstract}
+	The paper Pixel Recurrent Neural Network by Google DeepMind is thoroughly analyzed. A detailed critique is given of the aforementioned paper which presents a generative model for natural images that sequentially predicts pixels in images along the two spatial dimensions. The method models a discrete probability distribution and proposes a scalable solution for the unsupervised learning problem, curating results consistent with the proposed theory.
+\end{abstract}
+
+\section{Introduction}
+	Generative image modeling is an unsupervised learning problem wherein a probability density approach is utilized. The given work employs advanced two-dimensional RNNs, one being the Row LSTM layer wherein the convolution is applied along each row and the other being the Diagonal BiLSTM layer in which the convolution is applied along the diagonals.\\
+	\\
+	A second simplified architecture of PixelCNN is also proposed with a fixed dependency range, using Masked convolutions. The PixelCNN preserves the spatial resolution of the input throughout the layers and outputs a conditional distribution at each location.\\
+	\\
+	Modeling the pixels as discrete values using a multinomial distribution implemented using softmax provides with both representational and training advantages for the model.
+	
+	
+	
+	
+	
+\section{Overview}
+The aim of the paper Pixel RNN is to estimate a distribution over natural images which can easily be used to calculate the feasibility of images along manageable lines along with generating newer ones. The proposed network predicts the conditional distribution by scanning each pixel at a time, garnering information from it.\\
+\\
+For the pixel generation process, two-dimensional LSTM network was proposed that takes all the pixel inputs in a serialized fashion.
+
+
+
+
+\subsection{Generating Image Pixel by Pixel}
+The probability function $p(x)$ is defined as:\\
+\\
+$\mathlarger{p ( \mathbf { x } ) = \prod _ { i = 1 } ^ { n ^ { 2 } } p \left( x _ { i } | x _ { 1 } , \ldots , x _ { i - 1 } \right)}$\\
+\\
+Where $x _ { 1 } , \dots , x _ { n ^ { 2 } }$ are the image pixels and the probability of the \textit{i-th} pixel $x _ { i }$ given all the previous pixels is depicted by $p \left( x _ { i } | x _ { 1 } , \dots , x _ { i - 1 } \right)$\\
+\\
+Each pixel $x _ { i }$ is in turn determined by the three RGB color channels, and thus the distribution $p \left( x _ { i } | \mathbf { x } _ { < i } \right)$ is rewritten as follows:\\
+\\
+$p \left( x _ { i , R } | \mathbf { x } _ { < i } \right) p \left( x _ { i , G } | \mathbf { x } _ { < i } , x _ { i , R } \right) p \left( x _ { i , B } | \mathbf { x } _ { < i } , x _ { i , R } , x _ { i , G } \right)$\\
+\\
+The training on the pixel values is computed parallelly while the image pixel generation is sequential.
+
+
+
+
+
+\subsection{Pixel Recurrent Neural Networks}
+\subsubsection{Row LSTM}
+Here the convolution is performed using a one-dimensional convolution, computing features for the whole row at once. The layer captures roughly a triangular context above the pixel under consideration.\\
+\\
+Even though row LSTM is computationally less intense it does not takes the complete context into consideration while training.
+
+
+\subsubsection{Diagonal BiLSTM}
+It is designed to undertake computation diagonally thus incorporating the whole context along with parallelizing the process.
+
+
+
+\subsubsection{Residual Connections}
+The work involves training PixelRNNs of up to twelve layers of depth. Thus to involve ease of training and optimization, residual connections are used.
+
+\subsubsection{PixelCNN}
+PixelCNN uses multiple convolution layers to preserve the spatial resolution, while masks are used for proper conditioning and to avoid usage of future contexts.
+
+\subsubsection{Multi-Scale PixelRNN}
+It is composed of a singular unconditional PixelRNN and several conditional ones. The unconditional network generates a smaller $ s \times s $ image which is then fed into its conditional counterpart which generates a larger $ n \times n $ image.\\
+\\
+The conditional network is similar to the standard PixelRNN, but each of its layers is biased with an upsampled version of the small $ s \times s $ image.\\
+\\
+\textbf{Upsampling Process:} An enlarged feature map of size $ c \times n \times n $ is constructed, where $ c $ is the features in the output map.\\
+\\
+\textbf{Biasing Process:} For each layer in the conditional PixelRNN a simple mapping using $ 1 \times 1 $ unmasked convolution of $ c \times n \times n $ to $ 4h \times n \times n $ is added to the input-to-state map of the corresponding layer. 
+
+
+
+
+
+
+
+
+
+\subsubsection{Masked Convolutions}
+Masking is a method by which we can prevent the information flow from the future pixels into those which we would be predicting. To implement this we just need to zero out those weights and thus, that information would never be taken into consideration.
+
+
+
+
+\section{Experiments}
+
+\subsection{Evaluation}
+All the models are evaluated on the log-likelihood loss function from a discrete distribution. For MNIST the negative log-likelihood in \textit{nats} was reported. For CIFAR-10 and ImageNet, the same was reported in \textit{bits} per dimension. The discrete normalization was done by the dimensionality of the images.
+
+\subsection{Training}
+The models were trained using the torch toolbox on GPUs. RMSprop proved to be the best optimizer. For smaller datasets of MNIST and CIFAR-10, the batch size of 16 images proved to be optimal, whereas for ImageNet data batch size of 64 (on $ 32 \times 32 $ and 32 for $ 64 \times 64 $) was chosen.
+
+\subsection{Residual Connections}
+Use of Residual connections is as effective as using skip connections and using both reinforces the advantage. The performance of Row LSTM increases on increasing network depth.
+
+\subsection{Results}
+\begin{itemize}
+	\item On the CIFAR-10 dataset without data-augmentation, the Diagonal BiLSTM gave the best performance followed by Row LSTM and PixelCNN.
+	\item This can be deduced from the fact that Diagonal LSTM has the highest context under consideration followed by Row LSTM and PixelCNN. The Row LSTM has a partially occluded view whereas PixelCNN has the fewest pixels under consideration.
+	\item This also concludes that having a greater context window is important. Thus, we can say that the results are consistent with the proposed idea.
+	\item This work is the only one on the ImageNet dataset, hence providing new benchmarks.
+\end{itemize}
+
+
+\section{Merits}
+\begin{itemize}
+	\item This work improves upon deep RNNs as generative models for natural images.
+	\item Two novel two-dimensional layers, the Row LSTM, and the diagonal BiLSTM are proposed.
+	\item Previous approaches used a continuous distribution for the pixel values, whereas this work provides a discrete distribution $ p(x) $ for each conditional distribution. The distribution is then modeled with a softmax layer providing the advantage of being multimodal. Experimentally, this distribution is found easy to be learned and produces better performance compared to the continuous distribution.
+	\item Masked convolutions allow for full dependencies between color channels.
+	\item Residual Connections is advantageous compared to previous approaches that involve the use of gating along the depth of RNN as it does not require additional gates.
+	\item Given the scalable nature of the model, larger data will significantly improve results.
+	\item The PixelCNN proved to be the fastest architecture.
+\end{itemize}
+
+
+
+
+
+\end{document}
